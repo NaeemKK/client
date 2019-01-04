@@ -19,6 +19,15 @@ typedef void (*disconnect_func_t)(int err, void *user_data);
 typedef void (*notify_callback_t)(uint16_t value_handle,
 					const uint8_t *value, uint16_t length,
 					void *user_data);
+struct client {
+	int fd;
+	struct bt_att *att;
+	struct gatt_db *db;
+	struct bt_gatt_client *gatt;
+	OC_LIST_STRUCT(service_db);
+	unsigned int reliable_session_id;
+};
+
 typedef struct cb_valid_list
 {
 	struct cb_valid_list *next;

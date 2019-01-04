@@ -49,6 +49,7 @@
 #include "src/shared/gatt-client.h"
 
 #include "joule_btgatt-client.h"
+
 #define ATT_CID 4
 
 #define printf(...) \
@@ -68,14 +69,6 @@ OC_LIST(read_cb_list);
 OC_LIST(write_cb_list);
 OC_LIST(notify_cb_list);
 
-struct client {
-	int fd;
-	struct bt_att *att;
-	struct gatt_db *db;
-	struct bt_gatt_client *gatt;
-	OC_LIST_STRUCT(service_db);
-	unsigned int reliable_session_id;
-};
 
 static bdaddr_t src_addr;
 static pthread_t event_thread;
@@ -398,7 +391,7 @@ static uint16_t get_handle_for_uuid_str(struct client *cli,char *uuid_str)
 	chrc_db *chrc = oc_list_head(cli->service_db);
 	while(chrc != NULL)
 	{
-		if(!strcmp(chrc->uuid_str,uuid_str))
+		if(!strcasecmp(chrc->uuid_str,uuid_str))
 		{
 			return chrc->handle;
 		}
@@ -723,7 +716,7 @@ int joule_register_notify(struct client *cli, char *uuid_str,notify_callback_t f
 
 	id = bt_gatt_client_register_notify(cli->gatt, handle,
 							register_notify_cb,
-							notify_cb, cb_data, destory_notify_cb);
+							func, cb_data, destory_notify_cb);
 	if (!id)
 	{
 		free(cb_data);
